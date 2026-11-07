@@ -1,0 +1,68 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { python: "3.10", django: "Django>=4.2,<5.0", db: sqlite }
+          - { python: "3.12", django: "Django>=4.2,<5.0", db: postgres }
+          - { python: "3.12", django: "Django>=5.2,<6.0", db: sqlite }
+          - { python: "3.13", django: "Django>=5.2,<6.0", db: postgres }
+          - { python: "3.13", django: "Django>=5.2,<6.0", db: mysql }
+          - { python: "3.13", django: "Django>=6.1,<6.2", db: sqlite }
+          - { python: "3.13", django: "Django>=6.1,<6.2", db: postgres }
+          - { python: "3.13", django: "Django>=6.1,<6.2", db: mysql }
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: policytree
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: policytree
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd "mysqladmin ping -proot" --health-interval 5s --health-timeout 5s --health-retries 20
+
+    env:
+      DB: ${{ matrix.db }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install "${{ matrix.django }}" -e ".[test]"
+          if [ "$DB" = postgres ]; then pip install "psycopg[binary]>=3.1"; fi
+          if [ "$DB" = mysql ]; then pip install "mysqlclient>=2.2"; fi
+      - name: Check migrations are up to date
+        run: PYTHONPATH=src:. DJANGO_SETTINGS_MODULE=tests.settings python -m django makemigrations --check --dry-run
+      - name: Test
+        run: pytest -q --cov=policytree --cov-fail-under=95
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install ".[docs]"
+      - run: mkdocs build --strict

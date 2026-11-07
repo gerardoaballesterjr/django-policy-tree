@@ -1,0 +1,1 @@
+{% load policytree %}{% if object %}{% policy_can "update" object as can_edit %}can_edit={{ can_edit }}{% endif %}

@@ -1,0 +1,59 @@
+site_name: django-policy-tree
+site_author: Gerardo Ballester Jr.
+site_description: Domain-agnostic, tree-based permissions for Django and DRF, with policies superusers edit in the admin.
+repo_url: https://github.com/OWNER/django-policy-tree
+edit_uri: edit/main/docs/
+strict: true
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - search.suggest
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle: {icon: material/weather-night, name: Dark mode}
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle: {icon: material/weather-sunny, name: Light mode}
+
+markdown_extensions:
+  - admonition
+  - tables
+  - toc: {permalink: true}
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.details
+
+nav:
+  - Home: index.md
+  - Quickstart: quickstart.md
+  - Concepts:
+      - Organizations: concepts/organizations.md
+      - Members and roles: concepts/roles.md
+      - Policies: concepts/policies.md
+      - Scopes: concepts/scopes.md
+      - Conditions: concepts/conditions.md
+      - Fields: concepts/fields.md
+  - Guides:
+      - Django REST Framework: guides/drf.md
+      - Plain Django views: guides/views.md
+      - The engine anywhere: guides/engine.md
+      - UUIDs, soft delete, archiving: guides/base-model.md
+      - Operations: guides/operations.md
+  - Recipes:
+      - Company: recipes/company.md
+      - Retail chain: recipes/retail.md
+      - Healthcare: recipes/healthcare.md
+      - SaaS workspaces: recipes/saas.md
+      - Education: recipes/school.md
+  - Reference:
+      - Settings: reference/settings.md
+      - Python API: reference/api.md
+      - Management commands: reference/commands.md
+      - System checks: reference/checks.md
+  - Security: security.md
+  - Performance: performance.md
